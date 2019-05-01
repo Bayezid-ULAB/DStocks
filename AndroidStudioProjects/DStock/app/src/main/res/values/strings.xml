@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">DStocks</string>
+    <string name="open">open</string>
+    <string name="close">closed</string>
+    <string name="hello">Saved to:</string>
+    <string name="rotate"><u>Rotate your screen or click here to view graph</u></string>
+    <string name="closing">Closing \n price</string>
+</resources>

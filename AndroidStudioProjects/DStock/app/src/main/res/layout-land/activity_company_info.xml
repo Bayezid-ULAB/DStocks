@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/coor"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".CompanyInfo">
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/typeTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                app:tabGravity="fill"
+                app:tabMaxWidth="0dp"
+                app:tabMode="fixed">
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/lcp"
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+                    android:text="Closing Price" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/vol"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Trade" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/trade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="Volume" />
+
+            </android.support.design.widget.TabLayout>
+            <!--<android.support.design.widget.TabLayout
+                android:id="@+id/chartTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:tabMaxWidth="0dp"
+                app:tabGravity="fill"
+                app:tabMode="fixed">
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/oneMgraph"
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+                    android:text="1 month" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/threeMgraph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 months" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/sixMgraph"
+                    android:onClick="show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="6 months" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/nineMgraph"
+                    android:onClick="show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="9 months" />
+
+                <android.support.design.widget.TabItem
+                    android:id="@+id/oneYgraph"
+                    android:onClick="show"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:text="1 year" />
+                <android.support.design.widget.TabItem
+                android:id="@+id/twoYgraph"
+                android:onClick="show"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:text="2 years" />
+
+            </android.support.design.widget.TabLayout>
+                        -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                >
+                <com.github.mikephil.charting.charts.LineChart
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/companyChart"
+                    android:layout_weight="10">
+                </com.github.mikephil.charting.charts.LineChart>
+               <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+
+                   android:gravity="fill"
+
+                    >
+                    <Button
+                        android:layout_marginTop="20dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAllCaps="false"
+                        android:id="@+id/oneM"
+                        android:onClick="oneMonth"
+                        android:background="@drawable/buttonshape"
+                        android:layout_weight="1"
+                        android:text="1m"
+                        />
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+                    <Button
+                        android:layout_gravity="fill"
+                        android:layout_width="wrap_content"
+                        android:background="@drawable/buttonshapeunselected"
+                        android:id="@+id/threeM"
+                        android:layout_height="wrap_content"
+                        android:onClick="threeMonth"
+                        android:layout_weight="1"
+                        android:text="3m"/>
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+                   <Button
+                       android:layout_gravity="fill"
+                       android:layout_width="wrap_content"
+                       android:background="@drawable/buttonshapeunselected"
+                       android:layout_weight="1"
+                       android:onClick="sixMonth"
+                       android:id="@+id/sixM"
+                       android:layout_height="wrap_content"
+                       android:text="6m"/>
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+                   <Button
+                       android:layout_gravity="fill"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:onClick="nineMonth"
+                       android:background="@drawable/buttonshapeunselected"
+                       android:layout_weight="1"
+                       android:id="@+id/nineM"
+                       android:text="9m"/>
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+                   <Button
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:background="@drawable/buttonshapeunselected"
+                       android:layout_weight="1"
+                       android:onClick="oneYear"
+                       android:id="@+id/oneY"
+                       android:text="1y"/>
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+                   <Button
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:layout_weight="1"
+                       android:id="@+id/twoY"
+                       android:onClick="twoYear"
+                       android:background="@drawable/buttonshapeunselected"
+                       android:text="2y"/>
+                   <View
+                       android:layout_width="match_parent"
+                       android:layout_height="1dp"
+                       android:background="@drawable/fade_blue">
+
+                   </View>
+
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+</android.support.design.widget.CoordinatorLayout>

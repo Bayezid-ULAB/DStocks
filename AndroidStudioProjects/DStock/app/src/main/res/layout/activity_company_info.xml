@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/coor"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CompanyInfo">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:text="Companyname"
+        android:textStyle="bold"
+        android:id="@+id/name"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"/>
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:columnCount="2"
+        android:rowCount="14">
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:text="Company Code:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:id="@+id/code"
+            android:layout_gravity="left"
+            android:text="Company Name:"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Last Trading Price:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:id="@+id/ltp"
+            android:layout_gravity="left"
+            android:textSize="20sp"
+            android:text="Last Update"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="Today's Highest:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:id="@+id/highest"
+            android:textSize="20sp"
+            android:layout_gravity="left"
+            android:text="Last Update"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Today's Lowest:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:id="@+id/lowest"
+            android:text="Last Update"
+            android:layout_gravity="left"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:layout_gravity="fill"
+            android:textSize="20sp"
+            android:text="Change:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:id="@+id/change"
+            android:text="Company Name:"
+            android:layout_gravity="left"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Change:"
+            android:visibility="invisible"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:id="@+id/changeP"
+            android:layout_gravity="left"
+            android:text="Company Name:"
+            />
+
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Today's Closing Price:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:id="@+id/tcp"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:layout_gravity="left"
+            android:text="Opening Price"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:layout_marginRight="15dp"
+            android:text="Yesterday's Closing Price:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:id="@+id/ycp"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:layout_gravity="left"
+            android:text="Opening Price"
+            />
+
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Day's Value(Millions):"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:textSize="20sp"
+            android:id="@+id/value"
+            android:layout_gravity="left"
+            android:text="Opening Price"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Day's Volume:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:id="@+id/volume"
+            android:textSize="20sp"
+            android:layout_gravity="left"
+            android:text="Opening Price"
+            />
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="left"
+            android:layout_columnSpan="2"/>
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+        <TextView
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="left"
+            android:textSize="20sp"
+            android:text="Day's Trade:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            android:gravity="right"
+            android:id="@+id/trade"
+            android:textSize="20sp"
+            android:layout_gravity="left"
+            android:text="Opening Price"
+            />
+
+        <View android:layout_columnWeight="1"
+            android:background="@drawable/fade_blue"
+            android:layout_height="2dp"
+            android:layout_columnSpan="2"/>
+    </GridLayout>
+
+
+</LinearLayout>
+    </ScrollView>
+</android.support.design.widget.CoordinatorLayout>
