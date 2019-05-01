@@ -1,7 +1,9 @@
 package com.example.dstock;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
@@ -18,6 +20,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.IMarker;
@@ -284,10 +287,21 @@ public class CompanyInfo extends AppCompatActivity {
         super.onResume();
 
     }
-
+    private Drawable favorite;
+    private Drawable noFavorite;
+    private ArrayList<String> userfav;
+    private TextView addToFav;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        favorite = this.getResources().getDrawable( R.drawable.ic_star_black_24dp );
+        favorite.setBounds( 0, 0, 60, 60 );
+        noFavorite=this.getResources().getDrawable(R.drawable.ic_favorite_no);
+        noFavorite.setBounds(0,0,60,60);
+        userfav=MainActivity.getUserFavs();
+        if(userfav==null){
+            userfav=new ArrayList<>();
+        }
         vol=new ArrayList<>();
         vol3=new ArrayList<>();
         vol6=new ArrayList<>();
@@ -353,7 +367,14 @@ public class CompanyInfo extends AppCompatActivity {
         changeP=findViewById(R.id.changeP);
         if(getApplicationContext().getResources().getConfiguration().orientation== Configuration.ORIENTATION_PORTRAIT) {
 
-
+            addToFav=findViewById(R.id.addToFav);
+            if(company.isFav()){
+                addToFav.setCompoundDrawables(favorite,null,null,null);
+                addToFav.setText("Remove from Favorites");
+            }
+            else{
+                addToFav.setCompoundDrawables(noFavorite,null,null,null);
+            }
             try{
 
             }catch (Exception e){
@@ -374,106 +395,115 @@ public class CompanyInfo extends AppCompatActivity {
             changeP.setText(String.valueOf(company.getChangeP()) + "%");
         }
         else {
-            typeTabs=findViewById(R.id.typeTabs);
-            try{
-                typeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                    @Override
-                    public void onTabSelected(TabLayout.Tab tab) {
-                        if (tab==typeTabs.getTabAt(0)){
-
-                            try{
-                                tabNum=0;
-                            }catch (Exception d){
-
-                            }
-                        }
-                        else if(tab==typeTabs.getTabAt(1)){
-
-                            try{
-                                tabNum=1;
-
-                            }catch (Exception d){
-
-                            }
-                        }
-                        else{
-                            try{
-                                tabNum=2;
-                            }catch (Exception d){
-
-                            }
-                        }
-                        if(curDuration.equals("1m")){
-                            try{
-                                oneMonth(null);
-                            }catch (Exception e){
-
-                            }
-                        }
-                        else if(curDuration.equals("3m")){
-                            try{
-                                threeMonth(null);
-                            }catch (Exception e){
-
-                            }
-                        }
-                        else if(curDuration.equals("6m")){
-                            try{
-                                sixMonth(null);
-                            }catch (Exception e){
-
-                            }
-                        }
-                        else if(curDuration.equals("9m")){
-                            try{
-                                nineMonth(null);
-                            }catch (Exception e){
-
-                            }
-
-                        }
-                        else if(curDuration.equals("1y")){
-                            try{
-                                oneYear(null);
-                            }catch (Exception e){
-
-                            }
-
-                        }
-                        else if(curDuration.equals("2y")){
-                            try{
-                                twoYear(null);
-                            }catch (Exception e){
-
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onTabUnselected(TabLayout.Tab tab) {
-
-                    }
-
-                    @Override
-                    public void onTabReselected(TabLayout.Tab tab) {
-
-                    }
-                });
-            }catch (Exception e){
+            if(MainActivity.getCurrentUser().equals("guest")){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Guest user cannot see graphs, please sign up to use this feature!").show();
 
             }
-            oneM=findViewById(R.id.oneM);
-            twoY=findViewById(R.id.twoY);
-            oneY=findViewById(R.id.oneY);
-            threeM=findViewById(R.id.threeM);
-            sixM=findViewById(R.id.sixM);
-            nineM=findViewById(R.id.nineM);
-            mChart=findViewById(R.id.companyChart);
-           try{
-               oneMonth(null);
-           }catch (Exception e){
+            else{
 
-           }
+
+                typeTabs=findViewById(R.id.typeTabs);
+                try{
+                    typeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                        @Override
+                        public void onTabSelected(TabLayout.Tab tab) {
+                            if (tab==typeTabs.getTabAt(0)){
+
+                                try{
+                                    tabNum=0;
+                                }catch (Exception d){
+
+                                }
+                            }
+                            else if(tab==typeTabs.getTabAt(1)){
+
+                                try{
+                                    tabNum=1;
+
+                                }catch (Exception d){
+
+                                }
+                            }
+                            else{
+                                try{
+                                    tabNum=2;
+                                }catch (Exception d){
+
+                                }
+                            }
+                            if(curDuration.equals("1m")){
+                                try{
+                                    oneMonth(null);
+                                }catch (Exception e){
+
+                                }
+                            }
+                            else if(curDuration.equals("3m")){
+                                try{
+                                    threeMonth(null);
+                                }catch (Exception e){
+
+                                }
+                            }
+                            else if(curDuration.equals("6m")){
+                                try{
+                                    sixMonth(null);
+                                }catch (Exception e){
+
+                                }
+                            }
+                            else if(curDuration.equals("9m")){
+                                try{
+                                    nineMonth(null);
+                                }catch (Exception e){
+
+                                }
+
+                            }
+                            else if(curDuration.equals("1y")){
+                                try{
+                                    oneYear(null);
+                                }catch (Exception e){
+
+                                }
+
+                            }
+                            else if(curDuration.equals("2y")){
+                                try{
+                                    twoYear(null);
+                                }catch (Exception e){
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onTabUnselected(TabLayout.Tab tab) {
+
+                        }
+
+                        @Override
+                        public void onTabReselected(TabLayout.Tab tab) {
+
+                        }
+                    });
+                }catch (Exception e){
+
+                }
+                oneM=findViewById(R.id.oneM);
+                twoY=findViewById(R.id.twoY);
+                oneY=findViewById(R.id.oneY);
+                threeM=findViewById(R.id.threeM);
+                sixM=findViewById(R.id.sixM);
+                nineM=findViewById(R.id.nineM);
+                mChart=findViewById(R.id.companyChart);
+                try{
+                    oneMonth(null);
+                }catch (Exception e){
+
+                }
+            }
         }
     }
 
@@ -506,26 +536,26 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     public void oneMonth(View view) {
-        try{
-            if (tabNum == 0) {
-                initializeData(lcp,yvalues);
+        if(!MainActivity.getCurrentUser().equals("guest")) {
+            try {
+                if (tabNum == 0) {
+                    initializeData(lcp, yvalues);
+
+                } else if (tabNum == 1) {
+                    initializeData(trd1, yvalues);
+
+                } else {
+                    initializeData(vol, yvalues);
+
+                }
+                try {
+                    setChart(mChart);
+                } catch (Exception e) {
+
+                }
+            } catch (Exception e) {
 
             }
-            else if(tabNum==1){
-                initializeData(trd1,yvalues);
-
-            }
-            else{
-                initializeData(vol,yvalues);
-
-            }
-            try{
-                setChart(mChart);
-            }catch (Exception e){
-
-            }
-        }catch (Exception e){
-
         }
         curDuration="1m";
         oneM.setBackgroundResource(R.drawable.buttonshape);
@@ -537,6 +567,7 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     public void twoYear(View view) {
+        if(!MainActivity.getCurrentUser().equals("guest")){
         try{
             if (tabNum == 0) {
                 initializeData(lcp2y,yvalues);
@@ -557,7 +588,7 @@ public class CompanyInfo extends AppCompatActivity {
             }
         }catch (Exception e){
 
-        }
+        }}
         curDuration="2y";
         oneM.setBackgroundResource(R.drawable.buttonshapeunselected);
         threeM.setBackgroundResource(R.drawable.buttonshapeunselected);
@@ -569,6 +600,7 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     public void oneYear(View view) {
+        if(!MainActivity.getCurrentUser().equals("guest")){
         try{
             if (tabNum == 0) {
                 initializeData(lcp1y,yvalues);
@@ -590,7 +622,7 @@ public class CompanyInfo extends AppCompatActivity {
             }
         }catch (Exception e){
 
-        }
+        }}
         curDuration="1y";
         oneM.setBackgroundResource(R.drawable.buttonshapeunselected);
         threeM.setBackgroundResource(R.drawable.buttonshapeunselected);
@@ -601,6 +633,7 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     public void sixMonth(View view) {
+        if(!MainActivity.getCurrentUser().equals("guest")){
         try{
             if (tabNum == 0) {
                 initializeData(lcp6,yvalues);
@@ -622,7 +655,7 @@ public class CompanyInfo extends AppCompatActivity {
             }
         }catch (Exception e){
 
-        }
+        }}
         curDuration="6m";
         oneM.setBackgroundResource(R.drawable.buttonshapeunselected);
         threeM.setBackgroundResource(R.drawable.buttonshapeunselected);
@@ -634,6 +667,7 @@ public class CompanyInfo extends AppCompatActivity {
     }
     public void nineMonth(View view) {
 
+        if(!MainActivity.getCurrentUser().equals("guest")){
        try{
            if (tabNum == 0) {
                initializeData(lcp9,yvalues);
@@ -655,7 +689,7 @@ public class CompanyInfo extends AppCompatActivity {
        }catch (Exception e){
 
        }
-
+        }
         curDuration="9m";
         oneM.setBackgroundResource(R.drawable.buttonshapeunselected);
         threeM.setBackgroundResource(R.drawable.buttonshapeunselected);
@@ -666,29 +700,31 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     public void threeMonth(View view) {
+        if(!MainActivity.getCurrentUser().equals("guest")){
 
-       try{
-           if (tabNum == 0) {
-               initializeData(lcp3,yvalues);
+            try{
+                if (tabNum == 0) {
+                    initializeData(lcp3,yvalues);
 
-           }
-           else if(tabNum==1){
-               initializeData(trd3,yvalues);
+                }
+                else if(tabNum==1){
+                    initializeData(trd3,yvalues);
 
-           }
-           else{
-               initializeData(vol3,yvalues);
+                }
+                else{
+                    initializeData(vol3,yvalues);
 
-           }
+                }
 
-           try{
-               setChart(mChart);
-           }catch (Exception e){
+                try{
+                    setChart(mChart);
+                }catch (Exception e){
 
-           }
-       }catch (Exception e){
+                }
+            }catch (Exception e){
 
-       }
+            }
+        }
         curDuration="3m";
         oneM.setBackgroundResource(R.drawable.buttonshapeunselected);
         threeM.setBackgroundResource(R.drawable.buttonshape);
@@ -712,4 +748,35 @@ public class CompanyInfo extends AppCompatActivity {
         return myList;
 
     }
+
+    public void add_remove_fav(View view) {
+        noFavorite.setBounds( 0, 0, 60, 60 );
+        if(((Button)view).getText().toString().contains("Add")){
+
+            userfav.add(company.getCode());
+            MainActivity.setFavs(userfav);
+            Toast.makeText(this,"Added to Favorites",Toast.LENGTH_SHORT).show();
+            ((Button)view).setText("Remove From Favorites");
+            ((Button)view).setCompoundDrawables(favorite,null,null,null);
+        }
+        else if(((Button)view).getText().toString().contains("Remove")){
+            userfav.remove(company.getCode().toString());
+            MainActivity.setFavs(userfav);
+            Toast.makeText(this,"Removed from Favorites",Toast.LENGTH_SHORT).show();
+            ((Button)view).setText("Add to Favorites");
+            ((Button)view).setCompoundDrawables(noFavorite,null,null,null);
+        }
+    }
+    public void rotateScreenLandscape(View view) {
+        if(MainActivity.getCurrentUser().equals("guest")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Guest user cannot add Favorites, please sign up to use this feature!").show();
+        }
+        else{
+
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
+    }
+
 }

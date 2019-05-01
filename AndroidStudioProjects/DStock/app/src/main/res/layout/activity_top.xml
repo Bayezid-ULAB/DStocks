@@ -74,13 +74,6 @@
                 android:text="Company Code"
                 android:id="@+id/code"
                 android:textSize="18sp"/>
-            <TextView
-                android:layout_width="100dp"
-                android:gravity="right"
-                android:layout_height="wrap_content"
-                android:text="Info"
-                android:textSize="18sp"
-                />
 
         </LinearLayout>
         <android.support.v4.widget.SwipeRefreshLayout

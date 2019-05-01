@@ -3,6 +3,7 @@ package com.example.dstock;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.widget.ProgressBar;
 
 import com.google.gson.Gson;
 
@@ -28,6 +29,12 @@ public class FetchCompanyGraphData extends AsyncTask<Void,Void,Void> {
         this.formattedDate=date;
         this.context=context;
     //    System.out.println(code);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+
     }
 
     @Override

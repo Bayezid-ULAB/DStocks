@@ -1,6 +1,7 @@
 package com.example.dstock;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -14,6 +15,7 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -33,6 +35,7 @@ import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -45,6 +48,10 @@ import com.github.mikephil.charting.listener.OnChartGestureListener;
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.w3c.dom.Text;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
 import java.text.SimpleDateFormat;
@@ -58,10 +65,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String formattedDate;
     private int tabNum=0;
     private static boolean allowData=false;
-
+    private static Context context;
     public static void setAllowData(boolean allowData) {
         MainActivity.allowData = allowData;
     }
+
+
+    private ArrayList<Company> homeViewAndFavView=new ArrayList<>();
 
     public static boolean isAllowData() {
         return allowData;
@@ -71,8 +81,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MainActivity.connected = connected;
     }
 
-    private static boolean connected=false;
+    public static String getCurrentUser() {
+        return currentUser;
+    }
+
     private static String currentUser;
+    private static boolean connected=false;
     private static ArrayList<Company> userFav=new ArrayList<Company>();
 
     @Override
@@ -124,16 +138,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onNothingSelected() {
 
     }
+    @Override
+    protected  void onPause(){
+        super.onPause();
+        if(activityCurrent.equals("companyList")){
+            try{
+                myListPositionCompany= myList.getFirstVisiblePosition();
+            }catch (Exception e){
 
+            }
+        }
+
+        else if(activityCurrent.equals("top20")){
+            try{
+                myListPositionCompany= myList.getFirstVisiblePosition();
+            }catch (Exception e){
+
+            }
+        }
+    }
+
+    private int myListPositionCompany=0;
+    private int myListPositionTop=0;
     public void rotateScreenLandscape(View view) {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        if(currentUser.equals("guest")){
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Guest user cannot add Favorites, please sign up to use this feature!").show();
+        }
+        else{
+
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+        }
     }
 
 
 
 
     private CompanyListAdapter adapter;
+    private TopCompanyListAdapter adapterTop;
     private ListView myList;
     private DrawerLayout myDrawer;
     private static String lastTab="X";
@@ -288,10 +331,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 */
 
+    public static void loadFavs(){
+
+        SharedPreferences favoriteSharedPreferences=context.getSharedPreferences("favorites",MODE_PRIVATE);
+        Gson string=new Gson();
+        try{
+            String json=favoriteSharedPreferences.getString(currentUser,null);
+            Type type = new TypeToken<ArrayList<String>>() {}.getType();
+            userFavs = (string.fromJson(json, type));
+        }catch (Exception e){
+            userFavs=new ArrayList<>();
+        }
+    }
+    public static void setFavs(ArrayList<String> list){
+        SharedPreferences sharedPreferences=context.getSharedPreferences("favorites",MODE_PRIVATE);
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        Gson string=new Gson();
+        String json=string.toJson(list);
+        editor.putString(currentUser,json);
+        String d=currentUser;
+        editor.apply();
+        loadFavs();
+    }
+    public static ArrayList<String> getUserFavs() {
+        return userFavs;
+    }
+
+    private static ArrayList<String> userFavs=new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.loading);
+        context=getContext();
+
+
+
+
+        SharedPreferences userpreference=getSharedPreferences("obj",MODE_PRIVATE);
+         currentUser=userpreference.getString("lastuser",null);
+         loadFavs();
         if(companyList==null)companyList=new ArrayList<>();
         if(topCompanyListByValue==null)topCompanyListByValue=new ArrayList<>();
         if(topCompanyListByTrade==null)topCompanyListByTrade=new ArrayList<>();
@@ -355,7 +433,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         formattedDate = df.format(c);
 
 
-        companyList=loadCompanyData(companyList,"companyList");
+        try{
+            companyList=loadCompanyData(companyList,"companyList");
+        }catch (Exception e){
+
+        }
         sharedPrefs= this.getSharedPreferences("dates", MODE_PRIVATE);
 
         try{
@@ -411,6 +493,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             prefs.edit().putBoolean("appHasRunBefore", true).commit();
         }
+
+        if(activityCurrent.equals("companyList")){
+            try{
+                adapter = new CompanyListAdapter(this, R.layout.adapter_view, companyList,"companyList");
+                myList.setAdapter(adapter);
+                myList.setSelectionFromTop(myListPositionCompany,0);
+            }catch (Exception e){
+
+            }
+        }
+
+            else if(activityCurrent.equals("top20")){
+            try{
+                if(tabNum==0){
+                    adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByVolume,"byVolume");
+                    myList.setAdapter(adapterTop);
+                    myList.setSelectionFromTop(myListPositionTop,0);
+                }
+                else if(tabNum==1){
+                    adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByTrade,"byTrade");
+                    myList.setAdapter(adapterTop);
+                    myList.setSelectionFromTop(myListPositionTop,0);
+                }
+                else if(tabNum==2){
+                    adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByValue,"byValue");
+                    myList.setAdapter(adapterTop);
+                    myList.setSelectionFromTop(myListPositionTop,0);
+                }
+            }catch (Exception e){
+
+            }
+        }
     }
     @Override
     protected void onDestroy() {
@@ -459,8 +573,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mHandlerTaskInternet.run();
     }
 
+
     private void mainCall(){
 
+        try{
+            topCompanyListByTrade = loadCompanyData(topCompanyListByTrade, "topCompanyListByTrade");
+            companyList = loadCompanyData(companyList, "companyList");
+            topCompanyListByValue = loadCompanyData(topCompanyListByValue, "topCompanyListByValue");
+            topCompanyListByVolume = loadCompanyData(topCompanyListByVolume, "topCompanyListByVolume");
+
+        }catch (Exception e){
+
+        }
         activityCurrent="main";
         setContentView(R.layout.activity_main);
         coordinatorLayout=findViewById(R.id.mainCoordinator);
@@ -477,7 +601,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getSupportActionBar().setTitle("Select Option");
             }
         };
-
 
         refreshMain.setEnabled(false);
         refreshMain.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -496,20 +619,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             @Override
             public void onSwipeBottom(){
-                if(content.getStatus()!=AsyncTask.Status.RUNNING){
-                    if(noInternetSnackbar==null||!noInternetSnackbar.isShown()){
-                        homeContent=new HomeContent(getContext(),mChart,lastTab,refreshMain);
-                        homeContent.execute();
-                        refreshMain.setRefreshing(true);
-                    }
-                }
+
             }
             @Override
             public void onSwipeLeft() {
                 if(myDrawer.isDrawerOpen(GravityCompat.START))myDrawer.closeDrawers();
             }
         });
+        myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+            public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
+                                    long id) {
+
+
+                myList.setClickable(false);
+                // We know the View is a <extView so we can cast it
+                try{
+                    Company selItem = (Company) adapter.getItem(position);
+                    Gson string=new Gson();
+                    String json=string.toJson(selItem);
+                    Intent a=new Intent(getContext(),CompanyInfo.class);
+                    SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
+                    if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
+                        ed = sharedPrefs.edit();
+                        new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
+                        ed.putBoolean(formattedDate+selItem.getCode(), true);
+                        ed.commit();
+                    }
+                    a.putExtra("company",json);
+                    a.putExtra("formatteddate",formattedDate);
+                    startActivity(a);
+                }catch (Exception e){
+
+                }
+                myList.setClickable(true);
+            }
+        });
         myDrawer.addDrawerListener(mytoggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mytoggle.syncState();
@@ -527,6 +672,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if(noInternetSnackbar==null||!noInternetSnackbar.isShown()){
                         homeContent=new HomeContent(getContext(),mChart,lastTab,refreshMain);
                         homeContent.execute();
+                        content=new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,getContext(),refreshCompanyList,false);
+                        content.execute();
                         refreshMain.setRefreshing(true);
                     }
                 }
@@ -538,6 +685,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         NavigationView navView=findViewById(R.id.navigation);
         navView.setNavigationItemSelectedListener(this);
+
+
+
+        if(homeViewAndFavView!=null||!homeViewAndFavView.isEmpty()){
+            homeViewAndFavView.clear();
+        }
+        loadFavs();
+        if(userFavs==null||userFavs.isEmpty()){
+            try{
+                homeViewAndFavView.add(topCompanyListByTrade.get(0));
+                homeViewAndFavView.add(topCompanyListByTrade.get(1));
+                homeViewAndFavView.add(topCompanyListByTrade.get(2));
+                homeViewAndFavView.add(topCompanyListByVolume.get(2));
+                homeViewAndFavView.add(topCompanyListByVolume.get(1));
+                homeViewAndFavView.add(topCompanyListByVolume.get(0));
+                homeViewAndFavView.add(topCompanyListByValue.get(0));
+                homeViewAndFavView.add(topCompanyListByValue.get(1));
+                homeViewAndFavView.add(topCompanyListByValue.get(2));
+                adapter=new CompanyListAdapter(this,R.layout.adapter_view,homeViewAndFavView,"companyList");
+                myList.setAdapter(adapter);
+            }catch (Exception e){
+
+                ((View)findViewById(R.id.viewbottom)).setVisibility(View.INVISIBLE);
+                ((View)findViewById(R.id.viewTop)).setVisibility(View.INVISIBLE);
+                ((TextView)findViewById(R.id.code)).setVisibility(View.INVISIBLE);
+            }
+        }
+        else{
+            companyList=loadCompanyData(companyList,"companyList");
+            TextView nag=findViewById(R.id.nag);
+            nag.setText("Your favorite companies below:");
+            for(Company company:companyList){
+                if(userFavs.contains(company.getCode().toString())){
+                    homeViewAndFavView.add(company);
+                }
+            }
+            adapter=new CompanyListAdapter(this,R.layout.adapter_view,homeViewAndFavView,"companyList");
+            myList.setAdapter(adapter);
+        }
     }
 
     private void marketOverView(){
@@ -638,26 +824,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         }
         if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if(currentUser.equals("guest")){
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setMessage("Guest user cannot see graphs, please sign up to use this feature!").show();
 
-            homeContent.loadOfflineChartData();
-            if (lastTab == "X") {
-                try {
+            }else{
+                homeContent.loadOfflineChartData();
+                if (lastTab == "X") {
+                    try {
+                        tabs.getTabAt(1).select();
+                        tabs.getTabAt(0).select();
+                    } catch (Exception e) {
+                        String d = e.getStackTrace().toString();
+                        System.out.println(e.getStackTrace());
+                    }
+                } else if (lastTab == "S") {
                     tabs.getTabAt(1).select();
-                    tabs.getTabAt(0).select();
-                } catch (Exception e) {
-                    String d = e.getStackTrace().toString();
-                    System.out.println(e.getStackTrace());
+                } else if (lastTab == "30") {
+                    tabs.getTabAt(2).select();
                 }
-            } else if (lastTab == "S") {
-                tabs.getTabAt(1).select();
-            } else if (lastTab == "30") {
-                tabs.getTabAt(2).select();
-            }
-          try{
-              homeContent.setChartDSE("X",mChart);
-          }catch (Exception e){
+                try{
+                    homeContent.setChartDSE("X",mChart);
+                }catch (Exception e){
 
-          }
+                }
+            }
+
         } else if (getContext().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             homeContent.loadOfflineHomeDataAll();
             homeContent.setValues();
@@ -665,19 +857,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if(!firstTime){
             if(getContext().getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE){
+                if(currentUser.equals("guest")){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setMessage("Guest user cannot see graphs, please sign up to use this feature!").show();
+                }
 
-                homeContent.loadOfflineChartData();
-                if(lastTab.equals("X")){
-                    tabs.getTabAt(1).select();
-                    tabs.getTabAt(0).select();
+                else{
+                    homeContent.loadOfflineChartData();
+                    if(lastTab.equals("X")){
+                        tabs.getTabAt(1).select();
+                        tabs.getTabAt(0).select();
+                    }
+                    else if(lastTab.equals("S")){
+                        tabs.getTabAt(1).select();
+                    }
+                    else if(lastTab.equals("30")){
+                        tabs.getTabAt(2).select();
+                    }
+                    // homeContent.setChart();
                 }
-                else if(lastTab.equals("S")){
-                    tabs.getTabAt(1).select();
-                }
-                else if(lastTab.equals("30")){
-                    tabs.getTabAt(2).select();
-                }
-                // homeContent.setChart();
             }
             else if(getContext().getResources().getConfiguration().orientation==Configuration.ORIENTATION_PORTRAIT){
                 if(homeContent.getStatus()==AsyncTask.Status.RUNNING)homeContent.cancel(true);
@@ -760,9 +958,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             else myDrawer.closeDrawers();
         }
-        else if(id==R.id.favorites){
-            if(activityCurrent!="favorite"){
-                favoriteCalled();
+        else if(id==R.id.userName){
+
+            if(activityCurrent!="settings"){
+                settingsCalled();
                 myDrawer.closeDrawers();
             }
             else myDrawer.closeDrawers();
@@ -814,8 +1013,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.finish();
     }
 
-
+    private TextView username;
+    private TextView email;
+    private TextView old_password;
+    private TextView new_password;
+    private TextView password_again;
+    User user;
     private void settingsCalled(){
+        if(currentUser.equals("guest")){
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setMessage("Guest users don't have profile, please sign up to use this feature!").show();
+        }
         setContentView(R.layout.activity_settings);
         coordinatorLayout=findViewById(R.id.coor);
         activityCurrent="settings";
@@ -831,40 +1040,180 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         };
 
+        myDrawer.setOnTouchListener(new SwipeDetect(){
+            @Override
+            public void onSwipeRight() {
+                myDrawer.openDrawer(Gravity.LEFT);
+
+            }
+            @Override
+            public void onSwipeBottom(){
+
+            }
+            @Override
+            public void onSwipeLeft() {
+                if(myDrawer.isDrawerOpen(GravityCompat.START))myDrawer.closeDrawers();
+            }
+        });
         myDrawer.addDrawerListener(mytoggle);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mytoggle.syncState();
         NavigationView navView=findViewById(R.id.navigationCompany);
         navView.setNavigationItemSelectedListener(this);
 
-    }
+        username=findViewById(R.id.name);
+        email=findViewById(R.id.email);
+        old_password=findViewById(R.id.password);
+        new_password=findViewById(R.id.new_password);
+        password_again=findViewById(R.id.new_password_again);
 
+        SharedPreferences sharedPreferences=getSharedPreferences("obj",MODE_PRIVATE);
+        Gson string=new Gson();
+        String json=sharedPreferences.getString(currentUser.toLowerCase(),null);
 
+        Type type = new TypeToken<User>() {}.getType();
+        user = string.fromJson(json, type);
+       try{
+           username.setText(user.getName());
+           email.setText(user.getEmail());
+       }catch (Exception e){
 
-    private void favoriteCalled(){
-        setContentView(R.layout.activity_favorite);
-        coordinatorLayout=findViewById(R.id.coor);
-        activityCurrent="favorite";
-        getSupportActionBar().setTitle("My Favorites");
-        myDrawer=findViewById(R.id.drawerCompany);
-        mytoggle=new ActionBarDrawerToggle(this,myDrawer,R.string.open,R.string.close){
-            public void onDrawerClosed(View view) {
-                getSupportActionBar().setTitle("My Favorites");
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                getSupportActionBar().setTitle("Select Option");
-            }
-        };
-
-        myDrawer.addDrawerListener(mytoggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        mytoggle.syncState();
-        NavigationView navView=findViewById(R.id.navigationCompany);
-        navView.setNavigationItemSelectedListener(this);
+       }
 
     }
 
+
+    public boolean validate() {
+        boolean valid = true;
+
+        String name = username.getText().toString();
+        // String address = _addressText.getText().toString();
+        String email_add = email.getText().toString();
+        // String mobile = _mobileText.getText().toString();
+        String password = new_password.getText().toString();
+        String oldPass = old_password.getText().toString();
+        String passwordReEntered = password_again.getText().toString();
+        //String reEnterPassword = _reEnterPasswordText.getText().toString();
+
+        if (name.isEmpty() || name.length() < 3) {
+            username.setError("at least 3 characters");
+            valid = false;
+        } else {
+            username.setError(null);
+        }
+
+        // if (address.isEmpty()) {
+        //      _addressText.setError("Enter Valid Address");
+        //      valid = false;
+        //  } else {
+        //      _addressText.setError(null);
+        //  }
+
+
+        if (!email_add.isEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email_add).matches()) {
+            //if(email.isEmpty()){
+            email.setError("enter a valid email");
+            valid = false;
+        } else {
+            email.setError(null);
+        }
+
+
+        if (!password.isEmpty() && password.length() < 6) {
+            new_password.setError("Atleast 6 Characters long");
+            valid = false;
+        } else {
+            new_password.setError(null);
+        }
+        if(!password.equals(passwordReEntered)){
+            password_again.setError("Passwords do not match");
+            valid=false;
+        }else{
+            password_again.setError(null);
+        }
+
+        if(oldPass.isEmpty()&&password.isEmpty()&&passwordReEntered.isEmpty()){
+            valid=true;
+        }
+        return valid;
+    }
+
+    public void updateInfo(View view) {
+        ((Button)view).setEnabled(false);
+        if (!validate()) {
+
+            ((Button)view).setEnabled(true);
+            return;
+        }
+
+        String name = username.getText().toString();
+        // String address = _addressText.getText().toString();
+        String email_add = email.getText().toString();
+        // String mobile = _mobileText.getText().toString();
+        String oldPass = old_password.getText().toString();
+        String password = new_password.getText().toString();
+        String passwordReEntered = password_again.getText().toString();
+
+        if(name.equals(currentUser.toLowerCase()) && email_add.equals(user.getEmail()) && oldPass.isEmpty()&&password.isEmpty()&&passwordReEntered.isEmpty()){
+            Snackbar.make(coordinatorLayout,"Nothing to Update",Snackbar.LENGTH_SHORT).show();
+            ((Button)view).setEnabled(true);
+            return;
+        }
+        String passwordHashedSalted=null;
+        if(oldPass.isEmpty()&&password.isEmpty()&&passwordReEntered.isEmpty()){
+            passwordHashedSalted=user.getPasswordSaltedHash();
+        }
+        else{
+            try{
+                if(LoginActivity.validatePassword(oldPass,user.getPasswordSaltedHash())){
+                    passwordHashedSalted=Hashing.generateStrongPasswordHash(password);
+                }
+                else{
+                    old_password.setError("Old password is not Correct! Try Again");
+
+                    ((Button)view).setEnabled(true);
+                    return;
+                }
+            }catch (Exception e){
+
+            }
+        }
+        ArrayList<String> userFav=getUserFavs();
+        SharedPreferences mySPrefs = getSharedPreferences("obj",MODE_PRIVATE);
+        SharedPreferences.Editor editor = mySPrefs.edit();
+        editor.remove(name);
+        editor.apply();
+        mySPrefs=getSharedPreferences("favorites",MODE_PRIVATE);
+        editor=mySPrefs.edit();
+        editor.remove(name);
+        editor.apply();
+        currentUser=name;
+        SharedPreferences sharedPreferences=getSharedPreferences("obj",MODE_PRIVATE);
+        User newUser=new User(name.toLowerCase(),passwordHashedSalted,email_add);
+        editor=sharedPreferences.edit();
+        Gson string=new Gson();
+        String json=string.toJson(newUser);
+        editor.putString(name.toLowerCase(),json);
+        editor.apply();
+        setFavs(userFav);
+        SharedPreferences sharedPreferencess=getSharedPreferences("obj",MODE_PRIVATE);
+        Gson strings=new Gson();
+        String jsons=sharedPreferences.getString(currentUser.toLowerCase(),null);
+
+        Type type = new TypeToken<User>() {}.getType();
+        user = strings.fromJson(jsons, type);
+        try{
+            username.setText(user.getName());
+            email.setText(user.getEmail());
+            password_again.setText("");
+            new_password.setText("");
+            old_password.setText("");
+        }catch (Exception e){
+
+        }
+        Snackbar.make(coordinatorLayout,"Successfully Updated",Snackbar.LENGTH_SHORT).show();
+        ((Button)view).setEnabled(true);
+    }
 
     public static void setTopCompanyListByTrade(ArrayList<Company> topCompanyListByTrade) {
         topCompanyListByTrade = topCompanyListByTrade;
@@ -999,8 +1348,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         if(!topCompanyListByVolume.isEmpty()){
                             try{
-                                adapter=new CompanyListAdapter(getContext(), R.layout.adapter_view,topCompanyListByVolume);
-                                myList.setAdapter(adapter);
+                                adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByVolume,"byVolume");
+                                myList.setAdapter(adapterTop);
                                 tabNum=0;
                             }catch (Exception e){
 
@@ -1015,8 +1364,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         if(!topCompanyListByTrade.isEmpty()){
                             try{
-                                adapter=new CompanyListAdapter(getContext(), R.layout.adapter_view,topCompanyListByTrade);
-                                myList.setAdapter(adapter);
+                                adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByTrade,"byTrade");
+                                myList.setAdapter(adapterTop);
                                 tabNum=1;
                             }catch (Exception e){
 
@@ -1031,8 +1380,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                         if(!topCompanyListByValue.isEmpty()){
                             try{
-                                adapter=new CompanyListAdapter(getContext(), R.layout.adapter_view,topCompanyListByValue);
-                                myList.setAdapter(adapter);
+                                adapterTop=new TopCompanyListAdapter(getContext(), R.layout.adapter_viewtops,topCompanyListByValue,"byValue");
+                                myList.setAdapter(adapterTop);
                                 tabNum=2;
                             }catch (Exception e){
 
@@ -1062,8 +1411,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //TextView stv=findViewById(R.id.sTv);
             try{
                 if(!topCompanyListByVolume.isEmpty()){
-                    adapter=new CompanyListAdapter(this, R.layout.adapter_view,topCompanyListByVolume);
-                    myList.setAdapter(adapter);
+                    adapterTop=new TopCompanyListAdapter(this, R.layout.adapter_viewtops,topCompanyListByVolume,"byVolume");
+                    myList.setAdapter(adapterTop);
                 }
 
                 myList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1071,16 +1420,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onItemClick(AdapterView<?> parentAdapter, View view, int position,
                                             long id) {
 
-
+                        myList.setClickable(false);
                         // We know the View is a <extView so we can cast it
                         try{
-                            Company selItem = (Company) adapter.getItem(position);
+                            Company selItem = (Company) adapterTop.getItem(position);
                             Gson string=new Gson();
                             String json=string.toJson(selItem);
                             Intent a=new Intent(getContext(),CompanyInfo.class);
                             SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
-                            if(sharedPreferences.getAll()==null){
-
+                            if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
                                 ed = sharedPrefs.edit();
                                 new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
                                 ed.putBoolean(formattedDate+selItem.getCode(), true);
@@ -1092,6 +1440,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }catch (Exception e){
 
                         }
+                        myList.setClickable(true);
 
                     }
                 });
@@ -1155,7 +1504,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             if(!companyList.isEmpty()){
                 try{
-                    adapter = new CompanyListAdapter(this, R.layout.adapter_view, companyList);
+                    adapter = new CompanyListAdapter(this, R.layout.adapter_view, companyList,"companyList");
                     myList.setAdapter(adapter);
                 }catch (Exception e){
 
@@ -1168,6 +1517,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         long id) {
 
 
+                    myList.setClickable(false);
                     // We know the View is a <extView so we can cast it
                     try{
                         Company selItem = (Company) adapter.getItem(position);
@@ -1175,8 +1525,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         String json=string.toJson(selItem);
                         Intent a=new Intent(getContext(),CompanyInfo.class);
                         SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
-                        if(sharedPreferences.getAll()==null){
-
+                        if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
                             ed = sharedPrefs.edit();
                             new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
                             ed.putBoolean(formattedDate+selItem.getCode(), true);
@@ -1188,6 +1537,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }catch (Exception e){
 
                     }
+                    myList.setClickable(true);
                 }
             });
         }catch (Exception e){
@@ -1221,7 +1571,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     System.out.println(e.getStackTrace().toString());
                                 }
 
-                                adapter = new CompanyListAdapter(getContext(), R.layout.adapter_view, companyList);
+                                adapter = new CompanyListAdapter(getContext(), R.layout.adapter_view, companyList,"companyList");
                                 myList.setAdapter(adapter);
                             }
 
@@ -1271,13 +1621,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
     }
-
-    public void add_remove_fav(View view) {
-        Toast.makeText(this,"Clicked",Toast.LENGTH_LONG).show();
-    }
-
-
-
 
 
 }

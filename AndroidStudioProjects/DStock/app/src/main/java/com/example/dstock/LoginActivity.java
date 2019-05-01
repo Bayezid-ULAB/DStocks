@@ -75,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         return bytes;
     }
 
-    private static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
+    public static boolean validatePassword(String originalPassword, String storedPassword) throws NoSuchAlgorithmException, InvalidKeySpecException
     {
         String[] parts = storedPassword.split(":");
         int iterations = Integer.parseInt(parts[0]);
@@ -159,7 +159,7 @@ public class LoginActivity extends AppCompatActivity {
     private void saveLoginUser(String userName,boolean keepLoggedIn){
         SharedPreferences sharedPreferences=getSharedPreferences("obj",MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
-        editor.putString("lastuser",userName);
+        editor.putString("lastuser",userName.toLowerCase());
         editor.putBoolean("loggedIn",keepLoggedIn);
         editor.apply();
     }

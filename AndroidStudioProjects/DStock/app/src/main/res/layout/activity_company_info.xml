@@ -334,6 +334,28 @@
             android:layout_height="2dp"
             android:layout_columnSpan="2"/>
     </GridLayout>
+            <TextView
+                android:layout_marginTop="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle=""
+                android:text="@string/rotate"
+                android:textSize="14sp"
+                android:onClick="rotateScreenLandscape"
+                android:gravity="center"
+                />
+            <Button
+                android:id="@+id/addToFav"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="16dp"
+                android:text="Add to Favorites"
+                android:background="@android:color/transparent"
+                android:layout_gravity="center"
+                android:onClick="add_remove_fav"
+                android:drawableLeft="@drawable/ic_favorite_no"
+                android:textSize="12sp"/>
 
 
 </LinearLayout>

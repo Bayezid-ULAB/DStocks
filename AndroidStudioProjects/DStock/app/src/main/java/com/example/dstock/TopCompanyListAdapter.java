@@ -10,15 +10,14 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
-import butterknife.OnItemClick;
-
-public class CompanyListAdapter extends ArrayAdapter<Company> implements Filterable {
+public class TopCompanyListAdapter extends ArrayAdapter<Company> implements Filterable {
     private ArrayList<Company> companyList;
     private static final String TAG="CompanyListAdapter";
     private Filter companyFilter;
@@ -27,7 +26,7 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
     private ArrayList<String> userFavs;
     int mResources;
     private String type;
-    public CompanyListAdapter(@NonNull Context context, int resource, ArrayList<Company> objects,String type) {
+    public TopCompanyListAdapter(@NonNull Context context, int resource, ArrayList<Company> objects, String type) {
         super(context, resource, objects);
         oriList=objects;
         mContext=context;
@@ -36,7 +35,6 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
         mResources=resource;
         userFavs=MainActivity.getUserFavs();
         if ( userFavs ==null ) userFavs=new ArrayList<>();
-
     }
 
     @Override
@@ -52,21 +50,21 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
         LayoutInflater inflater=LayoutInflater.from(mContext);
         convertView=inflater.inflate(mResources,parent,false);
         TextView tltp=(TextView)convertView.findViewById(R.id.ltp);
+        TextView changeText=convertView.findViewById(R.id.changeText);
         TextView tcode=(TextView)convertView.findViewById(R.id.code);
         TextView tchange=(TextView)convertView.findViewById(R.id.change);
-        TextView tchangeP=(TextView)convertView.findViewById(R.id.changeP);
         TextView tName=(TextView)convertView.findViewById(R.id.name);
+        TextView tradevolumevalue= convertView.findViewById(R.id.tradevolumevalue);
         final ImageButton favBtn=(ImageButton)convertView.findViewById(R.id.favButton);
         favBtn.setFocusable(false);
-       if(userFavs!=null&&userFavs.contains(getItem(position).getCode())){
+        if(userFavs!=null&&userFavs.contains(getItem(position).getCode())){
             getItem(position).setFav(true);
-       }
+        }
         else getItem(position).setFav(false);
         favBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 Company myC=getItem(position);
-
                 if(myC.isFav()){
                     favBtn.setBackgroundResource(R.drawable.ic_favorite_no);
                     myC.setFav(false);
@@ -92,20 +90,45 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
             System.out.println(code);
         }
 
-        if(change<0)tchange.setTextColor(Color.RED);
-        else tchange.setTextColor(Color.GREEN);
-        if(type=="companyList"){
+        if(change<0){
+            tchange.setTextColor(Color.RED);
+            changeText.setTextColor(Color.RED);
+        }
+        else{
+            tchange.setTextColor(Color.GREEN);
+            changeText.setTextColor(Color.GREEN);
+        }
 
-            if(changeP<0)tchangeP.setTextColor(Color.RED);
-            else tchangeP.setTextColor(Color.GREEN);
-            tchange.setText("Change: "+ String.valueOf(change));
-            tchangeP.setText(String.valueOf(changeP+"%"));
+        if(type=="companyList"){
+            tchange.setText(String.valueOf(changeP+"%"));
             tltp.setText("LTP: "+ String.valueOf(ltp));
             tName.setText(String.valueOf(name));
         }
+        else if(type=="byTrade"){
+
+            tchange.setText(String.valueOf(changeP+"%"));
+            tltp.setText("LTP: "+ String.valueOf(ltp));
+            tName.setText(String.valueOf(name));
+            tradevolumevalue.setText("Trades: "+String.valueOf(getItem(position).getTrade()));
+        }
+        else if(type=="byVolume"){
+
+
+            tchange.setText(String.valueOf(changeP+"%"));
+            tltp.setText("LTP: "+ String.valueOf(ltp));
+            tName.setText(String.valueOf(name));
+            tradevolumevalue.setText("Volume: "+String.valueOf(getItem(position).getVolume()));
+        }
+        else if(type=="byValue"){
+
+            tchange.setText(String.valueOf(changeP+"%"));
+            tltp.setText("LTP: "+ String.valueOf(ltp));
+            tName.setText(String.valueOf(name));
+            tradevolumevalue.setText("Value: "+String.valueOf(getItem(position).getValue()));
+        }
 
     }catch (Exception e){
-        System.out.println("Catched exception");
+
     }
 return convertView;
     }
@@ -159,7 +182,7 @@ return convertView;
                 ArrayList<Company> nPlanetList = new ArrayList<Company>();
 
                 for (Company p : companyList) {
-                    if (p.getName().toLowerCase().startsWith(constraint.toString().toLowerCase())||p.getCode().toLowerCase().startsWith(constraint.toString().toLowerCase()))
+                    if (p.getName().toLowerCase().startsWith(constraint.toString()))
                         nPlanetList.add(p);
                 }
 
