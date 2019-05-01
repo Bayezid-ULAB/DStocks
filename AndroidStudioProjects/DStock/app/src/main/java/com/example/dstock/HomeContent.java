@@ -149,7 +149,7 @@ public class HomeContent extends AsyncTask<Void, Void, Void> {
                 valuesDseS.clear();
                 valuesDse30.clear();
                 valuesDseX.clear();
-                Document file= Jsoup.connect("http://www.dsebd.org").get();
+                Document file= Jsoup.connect(context.getString(R.string.baseUrl)).get();
                 file.outputSettings().indentAmount(0).prettyPrint(false);
                 Elements scripts=file.select("script");
                 String year=String.valueOf(Calendar.getInstance().get(Calendar.YEAR));

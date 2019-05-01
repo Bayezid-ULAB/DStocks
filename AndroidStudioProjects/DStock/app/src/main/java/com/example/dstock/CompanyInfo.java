@@ -2,6 +2,7 @@ package com.example.dstock;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -749,7 +750,7 @@ public class CompanyInfo extends AppCompatActivity {
 
     }
 
-    public void add_remove_fav(View view) {
+    public void add_remove_fav(final View view) {
         noFavorite.setBounds( 0, 0, 60, 60 );
         if(((Button)view).getText().toString().contains("Add")){
 
@@ -760,11 +761,30 @@ public class CompanyInfo extends AppCompatActivity {
             ((Button)view).setCompoundDrawables(favorite,null,null,null);
         }
         else if(((Button)view).getText().toString().contains("Remove")){
-            userfav.remove(company.getCode().toString());
-            MainActivity.setFavs(userfav);
-            Toast.makeText(this,"Removed from Favorites",Toast.LENGTH_SHORT).show();
-            ((Button)view).setText("Add to Favorites");
-            ((Button)view).setCompoundDrawables(noFavorite,null,null,null);
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            userfav.remove(company.getCode().toString());
+                            MainActivity.setFavs(userfav);
+                            Toast.makeText(context,"Removed from Favorites",Toast.LENGTH_SHORT).show();
+                            ((Button)view).setText("Add to Favorites");
+                            ((Button)view).setCompoundDrawables(noFavorite,null,null,null);
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+
+                            //No button clicked
+                            break;
+                    }
+                }
+
+            };
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            builder.setMessage("Are you sure you want to remove this company from your favorite List?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+
         }
     }
     public void rotateScreenLandscape(View view) {

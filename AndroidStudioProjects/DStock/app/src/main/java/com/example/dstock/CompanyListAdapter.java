@@ -1,6 +1,8 @@
 package com.example.dstock;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -65,13 +67,35 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
         favBtn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-                Company myC=getItem(position);
+                final Company myC=getItem(position);
 
                 if(myC.isFav()){
-                    favBtn.setBackgroundResource(R.drawable.ic_favorite_no);
-                    myC.setFav(false);
-                    userFavs.remove(myC.getCode().toString());
-                    MainActivity.setFavs(userFavs);
+
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which){
+                                case DialogInterface.BUTTON_POSITIVE:
+
+
+                                    favBtn.setBackgroundResource(R.drawable.ic_favorite_no);
+                                    myC.setFav(false);
+                                    userFavs.remove(myC.getCode().toString());
+                                    MainActivity.setFavs(userFavs);
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+
+                                    //No button clicked
+                                    break;
+                            }
+                        }
+
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                    builder.setMessage("Are you sure you want to remove this company from your favorite List?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener).show();
+
                 }
                 else if(!myC.isFav()){
                     favBtn.setBackgroundResource(R.drawable.ic_star_black_24dp);

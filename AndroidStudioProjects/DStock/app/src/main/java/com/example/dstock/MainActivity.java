@@ -494,7 +494,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             prefs.edit().putBoolean("appHasRunBefore", true).commit();
         }
 
-        if(activityCurrent.equals("companyList")){
+       /* if(activityCurrent.equals("companyList")){
             try{
                 adapter = new CompanyListAdapter(this, R.layout.adapter_view, companyList,"companyList");
                 myList.setAdapter(adapter);
@@ -524,7 +524,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }catch (Exception e){
 
             }
-        }
+        }*/
+       if(activityCurrent.equals("main")){
+           mainCall();
+       }
     }
     @Override
     protected void onDestroy() {
