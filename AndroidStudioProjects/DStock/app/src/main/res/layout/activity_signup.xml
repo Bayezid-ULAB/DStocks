@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:fitsSystemWindows="true">
@@ -67,9 +68,11 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:hint="Re-enter password"/>
-        </android.support.design.widget.TextInputLayout><CheckBox
+        </android.support.design.widget.TextInputLayout>
+        <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+            android:checked="true"
         android:text="Keep me logged in"
         android:id="@+id/keepMeLoggedIn"/>
 

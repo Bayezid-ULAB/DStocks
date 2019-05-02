@@ -261,7 +261,7 @@ public class FetchCompanyGraphData extends AsyncTask<Void,Void,Void> {
         return null;
     }
     private void saveGraphInfo(ArrayList<dateAndValue> list,String companyName,String dataListName){
-        SharedPreferences sharedPreferences=context.getSharedPreferences(formattedDate+companyName,MODE_PRIVATE);
+        SharedPreferences sharedPreferences=context.getSharedPreferences(companyName,MODE_PRIVATE);
         SharedPreferences.Editor editor=sharedPreferences.edit();
         Gson string=new Gson();
         String json=string.toJson(list);

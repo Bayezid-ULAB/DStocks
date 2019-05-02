@@ -117,11 +117,11 @@ public class CompanyListAdapter extends ArrayAdapter<Company> implements Filtera
         }
 
         if(change<0)tchange.setTextColor(Color.RED);
-        else tchange.setTextColor(Color.GREEN);
+        else tchange.setTextColor(Color.parseColor("#358206"));
         if(type=="companyList"){
 
             if(changeP<0)tchangeP.setTextColor(Color.RED);
-            else tchangeP.setTextColor(Color.GREEN);
+            else tchangeP.setTextColor(Color.parseColor("#358206"));
             tchange.setText("Change: "+ String.valueOf(change));
             tchangeP.setText(String.valueOf(changeP+"%"));
             tltp.setText("LTP: "+ String.valueOf(ltp));

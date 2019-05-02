@@ -393,7 +393,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if(content.getStatus()!=AsyncTask.Status.RUNNING)content.execute().get();
                         homeContent=new HomeContent(getContext(),mChart,lastTab,refreshMarket);
                         if(homeContent.getStatus()!=AsyncTask.Status.RUNNING)homeContent.execute().get();
-                        if(!companyList.isEmpty()){
+                       /* if(!companyList.isEmpty()){
                             for(Company d:companyList){
                                 if(!sharedPrefs.contains(formattedDate+d.getCode())){
 
@@ -404,7 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             }
 
-                        }
+                        }*/
                     }
                     else{
                         try{
@@ -445,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 content=new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,getContext(),refreshCompanyList,false);
                 if(content.getStatus()!=AsyncTask.Status.RUNNING)content.execute().get();
             }
-            if(!companyList.isEmpty()){
+            /*if(!companyList.isEmpty()){
                 for(Company d:companyList){
                     if(!sharedPrefs.contains(formattedDate+d.getCode())){
 
@@ -456,7 +456,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
 
-            }
+            }*/
         }catch (Exception e){
 
 
@@ -642,13 +642,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Gson string=new Gson();
                     String json=string.toJson(selItem);
                     Intent a=new Intent(getContext(),CompanyInfo.class);
-                    SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
-                    if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
-                        ed = sharedPrefs.edit();
-                        new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
-                        ed.putBoolean(formattedDate+selItem.getCode(), true);
-                        ed.commit();
-                    }
+                    SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
+                    ed = sharedPrefs.edit();
+                    new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute();
+                    ed.putBoolean(selItem.getCode(), true);
+                    ed.commit();
                     a.putExtra("company",json);
                     a.putExtra("formatteddate",formattedDate);
                     startActivity(a);
@@ -672,7 +670,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onSwipeBottom(){
                 if(content.getStatus()!=AsyncTask.Status.RUNNING){
-                    if(noInternetSnackbar==null||!noInternetSnackbar.isShown()){
+                    if((connected && allowData)||(connected && onWifi)){
                         homeContent=new HomeContent(getContext(),mChart,lastTab,refreshMain);
                         homeContent.execute();
                         content=new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,getContext(),refreshCompanyList,false);
@@ -695,17 +693,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             homeViewAndFavView.clear();
         }
         loadFavs();
-        if(userFavs==null||userFavs.isEmpty()){
+        ArrayList<String > homeCompanies=new ArrayList<>();
+        if((userFavs==null||userFavs.isEmpty())&&!topCompanyListByVolume.isEmpty()&&!topCompanyListByValue.isEmpty()&&!topCompanyListByTrade.isEmpty()){
             try{
-                homeViewAndFavView.add(topCompanyListByTrade.get(0));
-                homeViewAndFavView.add(topCompanyListByTrade.get(1));
-                homeViewAndFavView.add(topCompanyListByTrade.get(2));
-                homeViewAndFavView.add(topCompanyListByVolume.get(2));
-                homeViewAndFavView.add(topCompanyListByVolume.get(1));
-                homeViewAndFavView.add(topCompanyListByVolume.get(0));
-                homeViewAndFavView.add(topCompanyListByValue.get(0));
-                homeViewAndFavView.add(topCompanyListByValue.get(1));
-                homeViewAndFavView.add(topCompanyListByValue.get(2));
+                for(int i=0;i<3;){
+                    if(!homeCompanies.contains(topCompanyListByTrade.get(i).getCode())){
+                        homeViewAndFavView.add(topCompanyListByTrade.get(i));
+                        homeCompanies.add(topCompanyListByTrade.get(i).getCode());
+
+                    }
+                    i++;
+                }
+                for(int i=0;i<3;){
+                    if(!homeCompanies.contains(topCompanyListByVolume.get(i).getCode())){
+                        homeViewAndFavView.add(topCompanyListByVolume.get(i));
+                        homeCompanies.add(topCompanyListByVolume.get(i).getCode());
+
+                    }
+                    i++;
+                }for(int i=0;i<3;){
+                    if(!homeCompanies.contains(topCompanyListByValue.get(i).getCode())){
+                        homeViewAndFavView.add(topCompanyListByValue.get(i));
+                        homeCompanies.add(topCompanyListByValue.get(i).getCode());
+                    }
+                    i++;
+                }
                 adapter=new CompanyListAdapter(this,R.layout.adapter_view,homeViewAndFavView,"companyList");
                 myList.setAdapter(adapter);
             }catch (Exception e){
@@ -915,7 +927,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onSwipeBottom(){
                 if(homeContent.getStatus()!=AsyncTask.Status.RUNNING){
-                    if(noInternetSnackbar==null||!noInternetSnackbar.isShown()){
+                    if((connected && allowData)||(connected && onWifi)){
                         homeContent=new HomeContent(getContext(),mChart,lastTab,refreshMarket);
                         homeContent.execute();
                         refreshMarket.setRefreshing(true);
@@ -1295,7 +1307,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onSwipeBottom(){
                 if(myList.getFirstVisiblePosition()==0) {
                     if (content.getStatus() != AsyncTask.Status.RUNNING) {
-                        if (noInternetSnackbar == null || !noInternetSnackbar.isShown()) {
+                        if ((connected && allowData)||(connected && onWifi)) {
                             content = new Content(companyList, topCompanyListByTrade, topCompanyListByValue, topCompanyListByVolume, getContext(), refreshTopCompanies,true);
                             refreshTopCompanies.setRefreshing(true);
                             content.execute();
@@ -1426,17 +1438,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         myList.setClickable(false);
                         // We know the View is a <extView so we can cast it
                         try{
-                            Company selItem = (Company) adapterTop.getItem(position);
+                            Company selItem = (Company) adapter.getItem(position);
                             Gson string=new Gson();
                             String json=string.toJson(selItem);
                             Intent a=new Intent(getContext(),CompanyInfo.class);
-                            SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
-                            if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
-                                ed = sharedPrefs.edit();
-                                new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
-                                ed.putBoolean(formattedDate+selItem.getCode(), true);
-                                ed.commit();
-                            }
+                            SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
+                            ed = sharedPrefs.edit();
+                            new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute();
+                            ed.putBoolean(selItem.getCode(), true);
+                            ed.commit();
                             a.putExtra("company",json);
                             a.putExtra("formatteddate",formattedDate);
                             startActivity(a);
@@ -1527,13 +1537,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Gson string=new Gson();
                         String json=string.toJson(selItem);
                         Intent a=new Intent(getContext(),CompanyInfo.class);
-                        SharedPreferences sharedPreferences=getContext().getSharedPreferences(formattedDate+selItem.getCode(),MODE_PRIVATE);
-                        if(sharedPreferences.getString("vol",null)==null||sharedPreferences.getString("trd",null)==null||sharedPreferences.getString("lcp",null)==null){
-                            ed = sharedPrefs.edit();
-                            new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute().get();
-                            ed.putBoolean(formattedDate+selItem.getCode(), true);
-                            ed.commit();
-                        }
+                        SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
+                        ed = sharedPrefs.edit();
+                        ed.putBoolean(selItem.getCode(), true);
+                        ed.commit();
                         a.putExtra("company",json);
                         a.putExtra("formatteddate",formattedDate);
                         startActivity(a);
@@ -1558,7 +1565,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     if (myList.getFirstVisiblePosition() == 0) {
                         if (content.getStatus() != AsyncTask.Status.RUNNING) {
-                            if (noInternetSnackbar == null || !noInternetSnackbar.isShown()) {
+                            if ((connected && allowData)||(connected && onWifi)) {
                                 if (companyList == null) companyList = new ArrayList<Company>();
                                 if (topCompanyListByValue == null)
                                     topCompanyListByValue = new ArrayList<Company>();

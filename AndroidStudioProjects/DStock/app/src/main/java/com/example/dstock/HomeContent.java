@@ -433,21 +433,25 @@ public class HomeContent extends AsyncTask<Void, Void, Void> {
 
     }
     public void setValues(){
-        MainActivity.x1.setText(x1);
-        MainActivity.s1.setText(s1);
-        MainActivity.t1.setText(t1);
-        MainActivity.i1.setText(i1);
-        MainActivity.i2.setText(i2);
-        MainActivity.i3.setText(i3);
-        MainActivity.x2.setText(x2);
-        MainActivity.s2.setText(s2);
-        MainActivity.t2.setText(t2);
-        MainActivity.x3.setText(x3);
-        MainActivity.s3.setText(s3);
-        MainActivity.t3.setText(t3);
-        MainActivity.tr1.setText(tr1);
-        MainActivity.tr2.setText(tr2);
-        MainActivity.tr3.setText(tr3);
+        try{
+            MainActivity.x1.setText(String.format("%.2f",Double.parseDouble(x1)));
+            MainActivity.s1.setText(String.format("%.2f",Double.parseDouble(s1)));
+            MainActivity.t1.setText(String.format("%.2f",Double.parseDouble(t1)));
+            MainActivity.i1.setText(String.format("%.2f",Double.parseDouble(i1)));
+            MainActivity.i2.setText(String.format("%.2f",Double.parseDouble(i2)));
+            MainActivity.i3.setText(String.format("%.2f",Double.parseDouble(i3)));
+            MainActivity.x2.setText(String.format("%.2f",Double.parseDouble(x2)));
+            MainActivity.s2.setText(String.format("%.2f",Double.parseDouble(s2)));
+            MainActivity.t2.setText(String.format("%.2f",Double.parseDouble(t2)));
+            MainActivity.x3.setText(String.format("%.2f",Double.parseDouble(x3.replace("%","")))+"%");
+            MainActivity.s3.setText(String.format("%.2f",Double.parseDouble(s3.replace("%","")))+"%");
+            MainActivity.t3.setText(String.format("%.2f",Double.parseDouble(t3.replace("%","")))+"%");
+            MainActivity.tr1.setText(tr1);
+            MainActivity.tr2.setText(tr2);
+            MainActivity.tr3.setText(String.format("%.2f",Double.parseDouble(tr3)));
+        }catch (Exception e){
+
+        }
 
 
     }

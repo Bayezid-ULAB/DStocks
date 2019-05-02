@@ -119,8 +119,8 @@ public class TopCompanyListAdapter extends ArrayAdapter<Company> implements Filt
             changeText.setTextColor(Color.RED);
         }
         else{
-            tchange.setTextColor(Color.GREEN);
-            changeText.setTextColor(Color.GREEN);
+            tchange.setTextColor(Color.parseColor("#358206"));
+            changeText.setTextColor(Color.parseColor("#358206"));
         }
 
         if(type=="companyList"){

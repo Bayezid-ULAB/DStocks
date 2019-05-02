@@ -3,6 +3,7 @@ package com.example.dstock;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -14,6 +15,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -292,6 +294,7 @@ public class CompanyInfo extends AppCompatActivity {
     private Drawable noFavorite;
     private ArrayList<String> userfav;
     private TextView addToFav;
+    private CoordinatorLayout coordinatorLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -323,12 +326,25 @@ public class CompanyInfo extends AppCompatActivity {
         lcp2y=new ArrayList<>();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_company_info);
+        coordinatorLayout=findViewById(R.id.infoCor);
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+        ConnectivityReceiver connectivityReceiver=new ConnectivityReceiver(this,coordinatorLayout);
+        registerReceiver(connectivityReceiver, filter);
+        connectivityReceiver.isConnected(this);
         context=this;
         String json= getIntent().getStringExtra("company");
         Gson string=new Gson();
         Type type = new TypeToken<Company>() {}.getType();
         formattedDate=getIntent().getStringExtra("formatteddate");
         company= string.fromJson(json, type);
+        try{
+
+            if(MainActivity.isAllowData()||MainActivity.isOnWifi())new FetchCompanyGraphData(company.getCode(),this,formattedDate).execute();
+        }catch (Exception e){
+
+        }
 
 
         vol=loadCompanyData(vol,company.getCode(),"vol");
@@ -403,7 +419,11 @@ public class CompanyInfo extends AppCompatActivity {
             }
             else{
 
+                try{
+                    getSupportActionBar().setTitle("Company Info: If no data are shown check your connection and rotate again.");
+                }catch (Exception e){
 
+                }
                 typeTabs=findViewById(R.id.typeTabs);
                 try{
                     typeTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -736,7 +756,7 @@ public class CompanyInfo extends AppCompatActivity {
     }
 
     private ArrayList<dateAndValue> loadCompanyData(ArrayList<dateAndValue> myList,String companyName,String dataName){
-        SharedPreferences sharedPreferences=context.getSharedPreferences(formattedDate+companyName,MODE_PRIVATE);
+        SharedPreferences sharedPreferences=context.getSharedPreferences(companyName,MODE_PRIVATE);
 
         String json=sharedPreferences.getString(dataName,null);
         if(json!=null){
