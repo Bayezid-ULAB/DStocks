@@ -112,7 +112,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
         }
         else if(wifi.isConnectedOrConnecting()){
             MainActivity.setOnWifi(true);
-
+            MainActivity.trigger();
         }
         else if(!wifi.isConnectedOrConnecting())MainActivity.setOnWifi(false);
         if(wifi.isConnectedOrConnecting()||mobile.isConnectedOrConnecting()){
