@@ -81,6 +81,7 @@ public class ConnectivityReceiver extends BroadcastReceiver {
                             case DialogInterface.BUTTON_POSITIVE:
                                 MainActivity.setAllowData(true);
                                 MainActivity.setConnected(true);
+                                MainActivity.trigger();
                                 try{
                                     noInternet.dismiss();
                                 }catch (Exception e){

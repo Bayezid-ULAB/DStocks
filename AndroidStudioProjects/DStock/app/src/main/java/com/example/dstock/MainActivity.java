@@ -1,7 +1,6 @@
 package com.example.dstock;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.ClipData;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -10,12 +9,9 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
@@ -49,11 +45,7 @@ import com.github.mikephil.charting.listener.OnChartValueSelectedListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.w3c.dom.Text;
-
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.net.InetAddress;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -176,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     private CompanyListAdapter adapter;
+    CompanyListAdapter adapterHome;
     private TopCompanyListAdapter adapterTop;
     private ListView myList;
     private DrawerLayout myDrawer;
@@ -487,9 +480,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         else {
             /* Do first run stuff */
             if((connected && allowData)||(connected && onWifi)){
+try{
+    new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,getContext(),refreshCompanyList,true).execute().get();
+    new HomeContent(getContext(),mChart,lastTab,refreshMain).execute().get();
 
-                new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,getContext(),refreshCompanyList,true).execute();
-                new HomeContent(getContext(),mChart,lastTab,refreshMain).execute();
+}catch (Exception e){
+
+}
             }
             prefs.edit().putBoolean("appHasRunBefore", true).commit();
         }
@@ -622,7 +619,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             @Override
             public void onSwipeBottom(){
+                try{
 
+                }catch (Exception e){
+
+                }
             }
             @Override
             public void onSwipeLeft() {
@@ -638,15 +639,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 myList.setClickable(false);
                 // We know the View is a <extView so we can cast it
                 try{
-                    Company selItem = (Company) adapter.getItem(position);
+                    Company selItem = adapterHome.getItem(position);
                     Gson string=new Gson();
                     String json=string.toJson(selItem);
                     Intent a=new Intent(getContext(),CompanyInfo.class);
-                    SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
-                    ed = sharedPrefs.edit();
-                    new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute();
-                    ed.putBoolean(selItem.getCode(), true);
-                    ed.commit();
                     a.putExtra("company",json);
                     a.putExtra("formatteddate",formattedDate);
                     startActivity(a);
@@ -718,8 +714,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     i++;
                 }
-                adapter=new CompanyListAdapter(this,R.layout.adapter_view,homeViewAndFavView,"companyList");
-                myList.setAdapter(adapter);
+                adapterHome=new CompanyListAdapter(this,R.layout.adapter_view,homeViewAndFavView,"companyList");
+                myList.setAdapter(adapterHome);
             }catch (Exception e){
 
                 ((View)findViewById(R.id.viewbottom)).setVisibility(View.INVISIBLE);
@@ -956,7 +952,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    public static void trigger(){
+try{
+    new Content(companyList,topCompanyListByTrade,topCompanyListByValue,topCompanyListByVolume,ApplicationContext.getAppContext(),null,true).execute();
+    new HomeContent(ApplicationContext.getAppContext(),mChart,lastTab,null).execute();
+}catch (Exception e){
 
+}
+    }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         try{
@@ -1438,15 +1441,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         myList.setClickable(false);
                         // We know the View is a <extView so we can cast it
                         try{
-                            Company selItem = (Company) adapter.getItem(position);
+                            Company selItem = (Company) adapterTop.getItem(position);
                             Gson string=new Gson();
                             String json=string.toJson(selItem);
                             Intent a=new Intent(getContext(),CompanyInfo.class);
-                            SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
-                            ed = sharedPrefs.edit();
-                            new FetchCompanyGraphData(selItem.getCode(),getContext(),formattedDate).execute();
-                            ed.putBoolean(selItem.getCode(), true);
-                            ed.commit();
                             a.putExtra("company",json);
                             a.putExtra("formatteddate",formattedDate);
                             startActivity(a);
@@ -1537,10 +1535,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         Gson string=new Gson();
                         String json=string.toJson(selItem);
                         Intent a=new Intent(getContext(),CompanyInfo.class);
-                        SharedPreferences sharedPreferences=getContext().getSharedPreferences(selItem.getCode(),MODE_PRIVATE);
-                        ed = sharedPrefs.edit();
-                        ed.putBoolean(selItem.getCode(), true);
-                        ed.commit();
                         a.putExtra("company",json);
                         a.putExtra("formatteddate",formattedDate);
                         startActivity(a);
